@@ -2,7 +2,7 @@ import torch
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+from reachy_mini import ReachyMini
 
 class DepthToQSR:
 
@@ -26,6 +26,8 @@ class DepthToQSR:
         self.fx = None
         self.fy = None
 
+        with ReachyMini() as mini:
+            self.frame = mini.media.get_frame()
 
     def load_image(self, img_path):
         # load image with opencv
@@ -168,10 +170,10 @@ class DepthToQSR:
         return result
 
 
-    def process_image(self, img_path, detections):
+    def process_image(self, detections):
         # full pipeline
 
-        img_rgb = self.load_image(img_path)
+        img_rgb = self.load_image(self.frame)
 
         depth = self.estimate_depth(img_rgb)
 
