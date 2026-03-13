@@ -105,7 +105,7 @@ class DepthToQSR:
             self.fx = (d / 2.0) / np.tan(fov / 2.0)
 
         else:
-            raise ValueError(f"Invalid fov_type '{self.fov_type}'. Must be 'horizontal', 'vertical', or 'diagonal'.")
+            raise ValueError(f"Invalid fov_type '{self.fov_type}'. Must be 'horizontal', 'vertical', or 'diagonal'.") # for use in other camera models
 
         # assume square pixels
         self.fy = self.fx
