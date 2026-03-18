@@ -34,7 +34,7 @@ time.sleep(3)
 with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:
     time.sleep(3)  # give stream time to start
 
-    for _ in range (50): # try 30 frames
+    for _ in range (50): # how many frames to collect
 
         frame_id += 1
 

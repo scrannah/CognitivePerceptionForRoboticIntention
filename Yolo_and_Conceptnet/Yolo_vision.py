@@ -1,13 +1,14 @@
 import cv2
 import time
 from ultralytics import YOLO
-from conceptnet import get_info
+from Yolo_and_Conceptnet import get_info
 from reachy_mini import ReachyMini
-from depth_to_qsr import DepthToQSR
+from Depth_and_3D import DepthToQSR
 
 model = YOLO("yolov8n.pt")
+depth_processor = DepthToQSR()
 conceptnet_cache = {}
-frame_index = 0
+frame_id = 0
 collected_frames = []
 
 def build_detection(label, x1, y1, x2, y2):
@@ -33,9 +34,9 @@ time.sleep(3)
 with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:
     time.sleep(3)  # give stream time to start
 
-    for _ in range (50): # try 30 frames
+    for _ in range (50): # how many frames to collect
 
-        frame_index += 1
+        frame_id += 1
 
         frame, frame_timestamp = get_frame(mini)
         frame = frame.copy()
@@ -56,7 +57,7 @@ with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="ne
                     print(f"[ConceptNet] Looking up '{object_label}'...")
                     conceptnet_cache[object_label] = get_info(object_label)
                 concept_info = conceptnet_cache[object_label]
-                # print(concept_info)
+
 
                 cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
                 cv2.putText(frame, f"{object_label} {confidence_score:.0%}", (int(x1), int(y1) - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
@@ -67,24 +68,13 @@ with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="ne
                     fact = concept_info[relation][0]
                     cv2.putText(frame, f"{relation}: {fact}", (int(x1), int(y2) + 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 255), 1)
 
-        frame_record = {
-            "frame_id": frame_index,
-            "timestamp": frame_timestamp,
-            "detections": detections_in_frame
-        }
-
-        if len(detections_in_frame) > 0: # dont append frames with no detections, could be a vision error
+        if len(detections_in_frame) > 0: # don't append frames with no detections, could be a vision error
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img_rgb, depth, scene_package = depth_processor.process_image(
-                frame_rgb, detections_in_frame, frame_index, frame_timestamp
-            )
+            frame_rgb, depth, scene_package = depth_processor.process_image(
+                frame_rgb, detections_in_frame, frame_id, frame_timestamp
+            ) # attach frame id and timestamp to get full scene package in depth pipeline
             collected_frames.append(scene_package)
-            collected_frames.append(frame_record)
 
-        if detections_in_frame:
-            print("\n── Detections ──")
-            for detection in detections_in_frame:
-                print(f"  {detection}")
 
         cv2.imshow("Reachy Camera", frame)  # got a frame, show it
         cv2.waitKey(1)
