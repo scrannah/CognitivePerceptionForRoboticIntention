@@ -1,19 +1,15 @@
 import cv2
+import time
 from ultralytics import YOLO
 from conceptnet import get_info
+from reachy_mini import ReachyMini
 
 model = YOLO("yolov8n.pt")
-cap = cv2.VideoCapture(0)
+conceptnet_cache = {}
+frame_index = 0
+collected_frames = []
 
-if not cap.isOpened():
-    print("ERROR: Webcam did not open!")
-    exit()
-
-print("Webcam is running! Press Q to stop.")
-
-cache = {}
-
-def package(label, x1, y1, x2, y2):
+def build_detection(label, x1, y1, x2, y2):
     return {
         "label"   : label,
         "center_x": int((x1 + x2) / 2),
@@ -21,45 +17,70 @@ def package(label, x1, y1, x2, y2):
         "bbox"    : (int(x1), int(y1), int(x2), int(y2))
     }
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+def get_frame(mini):
+    # Wait until first frame arrives
+    while True: # repeat until frame
+        frame = mini.media.get_frame()
+        if frame is not None:
+            timestamp = time.time()
+            return frame, timestamp
+        time.sleep(0.05)  # not ready yet, wait and try again
 
-    results = model(frame, conf=0.5, verbose=False)
-    frame_detections = []
 
-    for result in results:
-        for box in result.boxes:
-            x1, y1, x2, y2 = box.xyxy[0].tolist()
-            label      = model.names[int(box.cls[0])]
-            confidence = float(box.conf[0])
-            det = package(label, x1, y1, x2, y2)
-            frame_detections.append(det)
 
-            if label not in cache:
-                print(f"[ConceptNet] Looking up '{label}'...")
-                cache[label] = get_info(label)
-            cn = cache[label]
+time.sleep(3)
+with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:
+    time.sleep(3)  # give stream time to start
 
-            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-            cv2.putText(frame, f"{label} {confidence:.0%}", (int(x1), int(y1) - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv2.circle(frame, (det["center_x"], det["center_y"]), 5, (0, 0, 255), -1)
+    for _ in range (50): # try 30 frames
 
-            if cn:
-                rel  = list(cn.keys())[0]
-                fact = cn[rel][0]
-                cv2.putText(frame, f"{rel}: {fact}", (int(x1), int(y2) + 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 255), 1)
+        frame_index += 1
 
-    if frame_detections:
-        print("\n── Detections ──")
-        for d in frame_detections:
-            print(f"  {d}")
+        frame, frame_timestamp = get_frame(mini)
+        frame = frame.copy()
 
-    cv2.imshow("YOLO + ConceptNet  |  Q = Quit", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        detection_results = model(frame, conf=0.5, verbose=False)
+        detections_in_frame = []
 
-cap.release()
+        for result in detection_results:
+            for box in result.boxes:
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                object_label   = model.names[int(box.cls[0])]
+                confidence_score = float(box.conf[0])
+
+                detection = build_detection(object_label, x1, y1, x2, y2)
+                detections_in_frame.append(detection)
+
+                if object_label not in conceptnet_cache:
+                    print(f"[ConceptNet] Looking up '{object_label}'...")
+                    conceptnet_cache[object_label] = get_info(object_label)
+                concept_info = conceptnet_cache[object_label]
+
+                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                cv2.putText(frame, f"{object_label} {confidence_score:.0%}", (int(x1), int(y1) - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                cv2.circle(frame, (detection["center_x"], detection["center_y"]), 5, (0, 0, 255), -1)
+
+                if concept_info:
+                    relation = list(concept_info.keys())[0]
+                    fact = concept_info[relation][0]
+                    cv2.putText(frame, f"{relation}: {fact}", (int(x1), int(y2) + 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 255), 1)
+
+        frame_record = {
+            "frame_id": frame_index,
+            "timestamp": frame_timestamp,
+            "detections": detections_in_frame
+        }
+
+        if len(detections_in_frame) > 0: # dont append frames with no detections, could be a vision error
+            collected_frames.append(frame_record)
+
+        # if detections_in_frame:
+            # print("\n── Detections ──")
+            # for detection in detections_in_frame:
+                # print(f"  {detection}")
+
+        cv2.imshow("Reachy Camera", frame)  # got a frame, show it
+        cv2.waitKey(1)
+
+print(collected_frames)
 cv2.destroyAllWindows()
-print("Closed.")
