@@ -4,9 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from reachy_mini import ReachyMini
 
+
 class DepthToQSR:
 
-    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="DPT_Hybrid"):
+    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="MiDaS_small"):
         # camera field of view
         self.fov_degrees = fov_degrees
         self.fov_type = fov_type
@@ -20,23 +21,11 @@ class DepthToQSR:
         midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
         self.transform = midas_transforms.dpt_transform
 
-        # camera intrinsics (filled later once image size known)
+        # camera intrinsics, filled later once image size known
         self.cx = None
         self.cy = None
         self.fx = None
         self.fy = None
-
-        with ReachyMini() as mini:
-            self.frame = mini.media.get_frame()
-
-    def load_image(self, img_path):
-        # load image with opencv
-        img_bgr = cv2.imread(img_path)
-
-        # convert BGR to RGB for plotting
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-
-        return img_rgb
 
 
     def estimate_depth(self, img_rgb):
@@ -170,10 +159,8 @@ class DepthToQSR:
         return result
 
 
-    def process_image(self, detections):
+    def process_image(self, image_rgb, detections, scene_id, timestamp):
         # full pipeline
-
-        img_rgb = self.load_image(self.frame)
 
         depth = self.estimate_depth(img_rgb)
 
@@ -187,9 +174,6 @@ class DepthToQSR:
             result = self.process_detection(detection, depth)
             objects.append(result)
 
-        # assume all detections belong to same scene/time
-        scene_id = detections[0]["scene_id"]
-        timestamp = detections[0]["timestamp"]
 
         scene_package = self.package_scene(scene_id, timestamp, objects)
 

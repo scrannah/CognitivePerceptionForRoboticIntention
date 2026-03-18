@@ -1,0 +1,1 @@
+from Yolo_and_Conceptnet.conceptnet import get_info
