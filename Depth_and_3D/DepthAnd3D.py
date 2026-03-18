@@ -7,7 +7,7 @@ from reachy_mini import ReachyMini
 
 class DepthToQSR:
 
-    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="MiDaS_small"):
+    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="DPT_Hybrid"):
         # camera field of view
         self.fov_degrees = fov_degrees
         self.fov_type = fov_type
@@ -50,13 +50,13 @@ class DepthToQSR:
         return depth
 
 
-    def show_results(self, img_rgb, depth):
+    def show_results(self, frame_rgb, depth):
         # show RGB and depth map
         plt.figure(figsize=(12,4))
 
         plt.subplot(1,2,1)
         plt.title("RGB")
-        plt.imshow(img_rgb)
+        plt.imshow(frame_rgb)
         plt.axis("off")
 
         plt.subplot(1,2,2)
@@ -154,27 +154,26 @@ class DepthToQSR:
         x, y, z = self.pixel_to_3d(u, v, depth)
 
         # package just the object info
-        result = self.package_object(label, x, y, z)
+        result = self.package_object(label, x, y, z) # get object as a list
 
         return result
 
 
-    def process_image(self, image_rgb, detections, scene_id, timestamp):
-        # full pipeline
-
-        depth = self.estimate_depth(img_rgb)
+    def process_image(self, image_rgb, detections, frame_id, timestamp):
+        # pipeline
+        depth = self.estimate_depth(image_rgb)
 
         # compute camera parameters once depth size known
         self.compute_intrinsics(depth)
 
-        objects = []
+        objects = [] # empty list to start from, each frame needs new object list
 
         # process each detection
-        for detection in detections:
-            result = self.process_detection(detection, depth)
-            objects.append(result)
+        for detection in detections: # going over the detections in frame list
+            result = self.process_detection(detection, depth) # for each detection on depth map, process
+            objects.append(result) # append each detection result to object list
 
 
-        scene_package = self.package_scene(scene_id, timestamp, objects)
+        scene_package = self.package_scene(frame_id, timestamp, objects) # package full scene as frame, with objects within
 
-        return img_rgb, depth, scene_package
+        return image_rgb, depth, scene_package # original frame, depth map, package
