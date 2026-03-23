@@ -6,6 +6,7 @@ from reachy_mini import ReachyMini
 from Depth_and_3D import DepthToQSR
 
 model = YOLO("yolov8n.pt")
+model.to("cuda")
 depth_processor = DepthToQSR()
 conceptnet_cache = {}
 frame_id = 0
