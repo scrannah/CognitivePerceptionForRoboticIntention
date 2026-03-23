@@ -7,7 +7,7 @@ from Yolo_and_Conceptnet import get_info
 from reachy_mini import ReachyMini
 from Depth_and_3D import DepthToQSR
 
-model = YOLO("yolo26s-seg.pt") # segmentation helps noisy bounding box results
+model = YOLO("yolo26l-seg.pt") # segmentation helps noisy bounding box results
 model.eval()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
