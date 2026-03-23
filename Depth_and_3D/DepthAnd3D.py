@@ -33,7 +33,7 @@ class DepthToQSR:
     def estimate_depth(self, img_rgb):
         # apply MiDaS transform
         input_batch = self.transform(img_rgb)
-        input_batch = input_batch.cuda()
+        input_batch = input_batch.to(self.device)
 
         # run model
         with torch.no_grad():
@@ -102,19 +102,6 @@ class DepthToQSR:
         # assume square pixels
         self.fy = self.fx
 
-
-    def bbox_center(self, bbox):
-        # bbox format [x1, y1, x2, y2]
-        x1, y1, x2, y2 = bbox
-
-        # centre of bounding box
-        # later this comes from upstream
-        u = int((x1 + x2) / 2)
-        v = int((y1 + y2) / 2)
-
-        return u, v
-
-
     def pixel_to_3d(self, u, v, depth):
         # numpy arrays indexed row, column [v, u]
         z = float(depth[v, u])
@@ -149,8 +136,9 @@ class DepthToQSR:
         bbox = detection["bbox"]
         label = detection["label"]
 
-        # get centre pixel of detection
-        u, v = self.bbox_center(bbox)
+        # get centre pixel of detection, remove bbox centre logic in depth it is unused
+        u = detection["centre_x"]
+        v = detection["centre_y"]
 
         # convert centre pixel to 3d, consider using median depth for bounding box
         # or use a cropped centre to remove background
