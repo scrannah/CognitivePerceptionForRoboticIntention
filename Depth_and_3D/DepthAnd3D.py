@@ -7,7 +7,7 @@ from reachy_mini import ReachyMini
 
 class DepthToQSR:
 
-    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="DPT_Hybrid"):
+    def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="DPT_Large"):
         # camera field of view
         self.fov_degrees = fov_degrees
         self.fov_type = fov_type
@@ -136,10 +136,10 @@ class DepthToQSR:
         }
 
 
-    def package_scene(self, scene_id, timestamp, objects):
+    def package_scene(self, frame_id, timestamp, objects):
         # package whole scene/frame for QSR
         return {
-            "scene_id": scene_id,
+            "frame_id": frame_id,
             "timestamp": timestamp,
             "objects": objects
         }
