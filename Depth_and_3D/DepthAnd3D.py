@@ -163,6 +163,7 @@ class DepthToQSR:
         # pipeline
         depth = self.estimate_depth(image_rgb)
 
+
         # compute camera parameters once depth size known
         self.compute_intrinsics(depth)
 
@@ -176,4 +177,5 @@ class DepthToQSR:
 
         scene_package = self.package_scene(frame_id, timestamp, objects) # package full scene as frame, with objects within
 
+        print(scene_package)
         return image_rgb, depth, scene_package # original frame, depth map, package

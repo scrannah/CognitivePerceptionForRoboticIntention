@@ -73,11 +73,13 @@ with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="ne
             frame_rgb, depth, scene_package = depth_processor.process_image(
                 frame_rgb, detections_in_frame, frame_id, frame_timestamp
             ) # attach frame id and timestamp to get full scene package in depth pipeline
+            cv2.imshow("depth image:", depth)
             collected_frames.append(scene_package)
 
 
         cv2.imshow("Reachy Camera", frame)  # got a frame, show it
+        # cv2.imshow(depth)
         cv2.waitKey(1)
 
-print(collected_frames)
+# print(collected_frames)
 cv2.destroyAllWindows()
