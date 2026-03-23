@@ -23,7 +23,7 @@ def build_detection(label, x1, y1, x2, y2):
         "center_x": int((x1 + x2) / 2),
         "center_y": int((y1 + y2) / 2),
         "bbox"    : (int(x1), int(y1), int(x2), int(y2))
-    } # keep as fallback for bad masks
+    } # keep as fallback for bad masks and visualisation
 
 def build_segmentation(label, centre_x, centre_y, bbox):
     return {
@@ -32,7 +32,6 @@ def build_segmentation(label, centre_x, centre_y, bbox):
         "center_y": int(centre_y),
         "bbox"    : (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))
     } # main method
-
 
 
 def get_frame(mini):
@@ -47,7 +46,8 @@ def get_frame(mini):
 
 
 time.sleep(3)
-with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:
+with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini: # declare ip here to prevent it defaulting to local
+    # library may need edits if refusing to connect
     time.sleep(3)  # give stream time to start
 
     for _ in range (500): # how many frames to collect
