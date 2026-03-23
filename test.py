@@ -1,4 +1,5 @@
 import cv2
+import torch
 import time
 from ultralytics import YOLO
 from Yolo_and_Conceptnet import get_info
@@ -6,6 +7,10 @@ from reachy_mini import ReachyMini
 from Depth_and_3D import DepthToQSR
 
 model = YOLO("yolov8n.pt")
+model.eval()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model.to(device)
+
 depth_processor = DepthToQSR()
 conceptnet_cache = {}
 frame_id = 0
@@ -34,16 +39,17 @@ time.sleep(3)
 with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:
     time.sleep(3)  # give stream time to start
 
-    for _ in range (50): # how many frames to collect
+    for _ in range (500): # how many frames to collect
 
         frame_id += 1
 
         frame, frame_timestamp = get_frame(mini)
         frame = frame.copy()
 
-        detection_results = model(frame, conf=0.5, verbose=False)
-        detections_in_frame = []
+        with torch.no_grad():
+            detection_results = model(frame, conf=0.5, verbose=False)
 
+        detections_in_frame = []
         for result in detection_results:
             for box in result.boxes:
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
@@ -78,7 +84,6 @@ with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="ne
 
 
         cv2.imshow("Reachy Camera", frame)  # got a frame, show it
-        # cv2.imshow(depth)
         cv2.waitKey(1)
 
 # print(collected_frames)

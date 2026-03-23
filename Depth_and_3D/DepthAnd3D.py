@@ -16,7 +16,8 @@ class DepthToQSR:
         # hybrid might be better suited later if using time series
         self.midas = torch.hub.load("intel-isl/MiDaS", model_name)
         self.midas.eval()
-        self.midas = self.midas.cuda()
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.midas = self.midas.to(self.device)
 
         # load MiDaS transforms
         midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
@@ -175,7 +176,7 @@ class DepthToQSR:
         for detection in detections: # going over the detections in frame list
             result = self.process_detection(detection, depth) # for each detection on depth map, process
             objects.append(result) # append each detection result to object list
-m
+
 
         scene_package = self.package_scene(frame_id, timestamp, objects) # package full scene as frame, with objects within
 
