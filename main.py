@@ -20,16 +20,16 @@ collected_frames = []
 def build_detection(label, x1, y1, x2, y2):
     return {
         "label"   : label,
-        "center_x": int((x1 + x2) / 2),
-        "center_y": int((y1 + y2) / 2),
+        "centre_x": int((x1 + x2) / 2),
+        "centre_y": int((y1 + y2) / 2),
         "bbox"    : (int(x1), int(y1), int(x2), int(y2))
     } # keep as fallback for bad masks and visualisation
 
 def build_segmentation(label, centre_x, centre_y, bbox):
     return {
         "label"   : label,
-        "center_x": int(centre_x),
-        "center_y": int(centre_y),
+        "centre_x": int(centre_x),
+        "centre_y": int(centre_y),
         "bbox"    : (int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3]))
     } # main method
 
@@ -100,7 +100,7 @@ with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="ne
                 frame_display = cv2.addWeighted(frame_display, 1.0, coloured_mask, 0.5, 0)
 
                 cv2.putText(frame_display, f"{object_label} {confidence_score:.0%}", (int(x1), int(y1) - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                cv2.circle(frame_display, (detection["center_x"], detection["center_y"]), 5, (0, 0, 255), -1)
+                cv2.circle(frame_display, (detection["centre_x"], detection["centre_y"]), 5, (0, 0, 255), -1)
 
                 if concept_info:
                     relation = list(concept_info.keys())[0]
