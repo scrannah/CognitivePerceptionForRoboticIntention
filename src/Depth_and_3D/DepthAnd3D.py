@@ -52,27 +52,6 @@ class DepthToQSR:
 
         return depth
 
-
-    def show_results(self, frame_rgb, depth):
-        # show RGB and depth map
-        plt.figure(figsize=(12,4))
-
-        plt.subplot(1,2,1)
-        plt.title("RGB")
-        plt.imshow(frame_rgb)
-        plt.axis("off")
-
-        plt.subplot(1,2,2)
-        plt.title("MIDAS relative depth")
-        plt.imshow(depth)
-        plt.axis("off")
-
-        plt.show()
-
-        print("depth shape:", depth.shape,
-              "min/max:", float(depth.min()), float(depth.max()))
-
-
     def compute_intrinsics(self, depth):
         # get height and width
         h, w = depth.shape
@@ -103,10 +82,12 @@ class DepthToQSR:
         self.fy = self.fx
 
     def pixel_to_3d(self, u, v, depth):
-        # numpy arrays indexed row, column [v, u]
-        z = float(depth[v, u])
+        # numpy arrays are indexed row, column [v, u]
+        z = float(depth[v, u]) # change to sampling of area OR using mask if mask fits criteria
+        # if mask pixel area not over x% of bbox, fall back to just sampling around area
 
         # convert pixel coordinates to camera coordinates
+        # back-projection of pinhole camera model
         x = (u - self.cx) * z / self.fx
         y = (v - self.cy) * z / self.fy
 
