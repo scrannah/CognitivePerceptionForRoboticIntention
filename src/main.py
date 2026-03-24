@@ -3,9 +3,9 @@ import torch
 import time
 import numpy as np
 from ultralytics import YOLO
-from src.Yolo_and_Conceptnet import get_info
+from Yolo_and_Conceptnet import get_info
 from reachy_mini import ReachyMini
-from src.Depth_and_3D import DepthToQSR
+from Depth_and_3D import DepthToQSR
 
 model = YOLO("../yolo26l-seg.pt") # segmentation helps noisy bounding box results
 model.eval()

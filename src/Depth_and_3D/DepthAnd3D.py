@@ -1,8 +1,7 @@
 import torch
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from reachy_mini import ReachyMini
+
 
 
 class DepthToQSR:
