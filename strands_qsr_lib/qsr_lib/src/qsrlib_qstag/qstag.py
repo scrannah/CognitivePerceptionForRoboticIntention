@@ -296,9 +296,9 @@ def get_graphlet_selections(episodes, params, object_types, vis=False):
             # combinations (r is from 1 to num_of_intervals)
             # of consecutive intervals (intervals in a stretch).
             hashed_IDs[obj_pair_comb] = {}
-            for len_ in xrange(1, num_of_interval_breaks+1):
+            for len_ in range(1, num_of_interval_breaks+1):
                 #print("len_=",len_)
-                for pos in xrange(num_of_interval_breaks):
+                for pos in range(num_of_interval_breaks):
                     # Find the combined interval of this combination of intervals
                     selected_intervals = interval_breaks[pos:pos+len_]
                     # Get the relations active in this active interval
@@ -429,13 +429,13 @@ def get_graph(episodes, object_types={}):
         graph.add_edge(edge_from_object, vertex_count)
         spatial_obj_edges.append((edge_from_object, vertex_count))
 
-        if spatial_edges is 2:
+        if spatial_edges == 2:
             #print("TWO OBJECTS -- ")
             edge_to_object = objects[objs[1]]
             graph.add_edge(vertex_count, edge_to_object)
             spatial_obj_edges.append( (vertex_count, edge_to_object) )
 
-        elif spatial_edges is 3:
+        elif spatial_edges == 3:
             #print("THREE OBJECTS -- ")
             edge_from_object_2 = objects[objs[1]]
             edge_from_object_3  = objects[objs[2]]

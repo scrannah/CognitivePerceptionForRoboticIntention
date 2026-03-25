@@ -22,8 +22,8 @@ class QTCBHMM(QTCHMMAbstractclass):
 
         qtc = []
         # creating list of possible states
-        for i in xrange(1, 4):
-            for j in xrange(1, 4):
+        for i in range(1, 4):
+            for j in range(1, 4):
                 qtc.append([i-2, j-2])
 
         # Calling parent to generate actual matrix

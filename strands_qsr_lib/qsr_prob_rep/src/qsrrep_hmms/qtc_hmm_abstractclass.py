@@ -24,12 +24,12 @@ class QTCHMMAbstractclass(HMMAbstractclass):
 
         # TODO insert matlab documentation on how this works here
         trans = np.zeros((size, size))
-        for i1 in xrange(qtc.shape[0]):
-            for i2 in xrange(i1+1, qtc.shape[0]):
+        for i1 in range(qtc.shape[0]):
+            for i2 in range(i1+1, qtc.shape[0]):
                 trans[i1+1, i2+1] = np.nanmax(np.absolute(qtc[i1]-qtc[i2])) != 2
                 if trans[i1+1, i2+1] == 1:
-                    for j1 in xrange(qtc.shape[1]-1):
-                        for j2 in xrange(j1+1, qtc.shape[1]):
+                    for j1 in range(qtc.shape[1]-1):
+                        for j2 in range(j1+1, qtc.shape[1]):
                             if sum(np.absolute(qtc[i1, [j1, j2]])) == 1 \
                                     and sum(np.absolute(qtc[i2, [j1, j2]])) == 1:
                                 if np.nanmax(np.absolute(qtc[i1, [j1, j2]]-qtc[i2, [j1, j2]])) > 0 \

@@ -25,13 +25,13 @@ class QTCBCHMM(QTCHMMAbstractclass):
 
         qtc = []
         # creating list of possible states
-        for i in xrange(1, 4):
-            for j in xrange(1, 4):
-                qtc.append([i-2, j-2, np.NaN, np.NaN])
-        for i in xrange(1, 4):
-            for j in xrange(1, 4):
-                for k in xrange(1, 4):
-                    for l in xrange(1, 4):
+        for i in range(1, 4):
+            for j in range(1, 4):
+                qtc.append([i-2, j-2, np.nan, np.nan])
+        for i in range(1, 4):
+            for j in range(1, 4):
+                for k in range(1, 4):
+                    for l in range(1, 4):
                         qtc.append([i-2, j-2, k-2, l-2])
 
         # Calling parent to generate actual matrix

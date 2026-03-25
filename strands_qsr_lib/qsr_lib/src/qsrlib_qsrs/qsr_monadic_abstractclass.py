@@ -57,7 +57,9 @@ class QSR_Monadic_Abstractclass(QSR_Abstractclass):
         :return: `bbox1`, `bbox2`
         :rtype: two lists of floats
         """
-        raise data1.return_bounding_box_2d(), data2.return_bounding_box_2d()
+        raise ValueError(
+        f"Unexpected bounding boxes: {data1.return_bounding_box_2d()} and {data2.return_bounding_box_2d()}"
+)
 
 
 class QSR_Monadic_2t_Abstractclass(QSR_Monadic_Abstractclass):

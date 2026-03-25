@@ -25,59 +25,59 @@ class QTCModelCreation(ModelCreationAbstractclass):
     def __create_states(self, qtc_type, start_end=False):
         if qtc_type == self.qtc_types.qtcbs:
             if start_end:
-                yield [np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
+                yield [np.nan, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
                     yield [i-2, j-2]
             if start_end:
-                yield [np.NaN, np.NaN]
+                yield [np.nan, np.nan]
         elif qtc_type == self.qtc_types.qtccs:
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
-                    for k in xrange(1, 4):
-                        for l in xrange(1, 4):
+                yield [np.nan, np.nan, np.nan, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
+                    for k in range(1, 4):
+                        for l in range(1, 4):
                             yield [i-2, j-2, k-2, l-2]
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
+                yield [np.nan, np.nan, np.nan, np.nan]
         elif qtc_type.startswith(self.qtc_types.qtcbcs):
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
-                    yield [i-2, j-2, np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
-                    for k in xrange(1, 4):
-                        for l in xrange(1, 4):
+                yield [np.nan, np.nan, np.nan, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
+                    yield [i-2, j-2, np.nan, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
+                    for k in range(1, 4):
+                        for l in range(1, 4):
                             yield [i-2, j-2, k-2, l-2]
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
+                yield [np.nan, np.nan, np.nan, np.nan]
         elif qtc_type == self.qtc_types.qtch:
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
-                    for k in xrange(1, 4):
-                        yield [i-2, j-2, k-2, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
-                    for k in xrange(1, 4):
-                        for l in xrange(1, 4):
+                yield [np.nan, np.nan, np.nan, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
+                    for k in range(1, 4):
+                        yield [i-2, j-2, k-2, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
+                    for k in range(1, 4):
+                        for l in range(1, 4):
                             yield [i-2, j-2, k-2, l-2]
             if start_end:
-                yield [np.NaN, np.NaN, np.NaN, np.NaN]
+                yield [np.nan, np.nan, np.nan, np.nan]
         elif qtc_type == self.qtc_types.robot:
             if start_end:
-                yield [np.NaN, np.NaN]
-            for i in xrange(1, 4):
-                yield [i-2, np.NaN]
-            for i in xrange(1, 4):
-                for j in xrange(1, 4):
+                yield [np.nan, np.nan]
+            for i in range(1, 4):
+                yield [i-2, np.nan]
+            for i in range(1, 4):
+                for j in range(1, 4):
                     yield [i-2, j-2]
             if start_end:
-                yield [np.NaN, np.NaN]
+                yield [np.nan, np.nan]
         else:
             print "QTC type: '%s' not found" % qtc_type
 
