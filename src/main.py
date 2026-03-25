@@ -56,8 +56,8 @@ class FullPipeline:
                     self.collected_frames.append(scene_package)
 
                     # TO QSR HERE
-                    self.world = self.QSRPipeline.build_world_trace(self.collected_frames)
-                    response = self.QSRPipeline.compute_qtc(self.world)
+                    world = self.QSRPipeline.build_world_trace(self.collected_frames)
+                    response = self.QSRPipeline.compute_qtc(world)
                     QSRPipeline.print_qtc(response)
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it

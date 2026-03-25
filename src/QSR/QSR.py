@@ -24,7 +24,7 @@ class QSRPipeline:
                 object_tracks[name].append(
                     Object_State(
                         name=name,
-                        frame_id=id,
+                        timestamp=id,
                         x=obj["x"],
                         y=obj["y"]
                     )
