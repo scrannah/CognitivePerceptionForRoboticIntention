@@ -3,19 +3,19 @@ import time
 import numpy as np
 from reachy_mini import ReachyMini
 from Yolo_and_Conceptnet import YOLOPipeline
-from Depth_and_3D import DepthToQSR
-
+from Depth_and_3D import DepthPipeline
+from QSR import QSRPipeline
 class FullPipeline:
 
     def __init__(self):
 
         self.collected_frames = []
-        self.frame_length = 500
+        self.frame_length = 100
         self.frame_id = 0
 
         self.YOLOPipeline = YOLOPipeline()
-        self.DepthPipeline = DepthToQSR()
-        # self.QSRPipeline = QSR()
+        self.DepthPipeline = DepthPipeline()
+        self.QSRPipeline = QSRPipeline()
 
     def get_frame(self, mini):
         # Wait until first frame arrives
@@ -44,6 +44,7 @@ class FullPipeline:
                 frame_display = self.YOLOPipeline.drawDetections(frame_display, detections_in_frame)
 
                 if len(detections_in_frame) > 0:  # don't append frames with no detections, could be a vision error
+                    # or decide to, objects leaving scene is still "interaction"
                     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame_rgb, depth, scene_package = self.DepthPipeline.process_image(
                         frame_rgb, detections_in_frame, self.frame_id, frame_timestamp
@@ -55,6 +56,9 @@ class FullPipeline:
                     self.collected_frames.append(scene_package)
 
                     # TO QSR HERE
+                    self.world = self.QSRPipeline.build_world_trace(self.collected_frames)
+                    response = self.QSRPipeline.compute_qtc(self.world)
+                    QSRPipeline.print_qtc(response)
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it
                 cv2.waitKey(1)

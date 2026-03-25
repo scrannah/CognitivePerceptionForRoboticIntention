@@ -1,10 +1,7 @@
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 
-
-
-class DepthToQSR:
+class DepthPipeline:
 
     def __init__(self, fov_degrees=120.0, fov_type="diagonal", model_name="DPT_Large"):
         # camera field of view

@@ -3,7 +3,7 @@ import torch
 import time
 import numpy as np
 from ultralytics import YOLO
-from Yolo_and_Conceptnet import get_info
+from Yolo_and_Conceptnet.conceptnet import get_info
 
 class YOLOPipeline:
 
