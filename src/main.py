@@ -5,6 +5,7 @@ from reachy_mini import ReachyMini
 from Yolo_and_Conceptnet import YOLOPipeline
 from Depth_and_3D import DepthPipeline
 from QSR import QSRPipeline
+
 class FullPipeline:
 
     def __init__(self):
@@ -55,10 +56,15 @@ class FullPipeline:
                     cv2.imshow("depth image:", depth)  # test output
                     self.collected_frames.append(scene_package)
 
-                    # TO QSR HERE
-                    world = self.QSRPipeline.build_world_trace(self.collected_frames)
-                    response = self.QSRPipeline.compute_qtc(world)
-                    QSRPipeline.print_qtc(response)
+                    if len(self.collected_frames) >= 2 and all(len(frame["objects"]) >= 2 for frame in self.collected_frames[-2:]):
+                        # if we have more than 2 frames AND the last two frames include more than or 2 objects
+                        world = self.QSRPipeline.build_world_trace(self.collected_frames)
+                        response = self.QSRPipeline.compute_qtc(world)
+                        self.QSRPipeline.print_qtc(response)
+
+                    else:
+                        continue
+
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it
                 cv2.waitKey(1)
