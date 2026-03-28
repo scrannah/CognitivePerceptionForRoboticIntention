@@ -44,7 +44,7 @@ class FullPipeline:
 
                 frame_display = self.YOLOPipeline.drawDetections(frame_display, detections_in_frame)
 
-                if len(detections_in_frame) > 0:  # don't append frames with no detections, could be a vision error
+                if len(detections_in_frame) >= 2:  # only append detections with more than 2
                     # or decide to, objects leaving scene is still "interaction"
                     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame_rgb, depth, scene_package = self.DepthPipeline.process_image(
@@ -56,15 +56,12 @@ class FullPipeline:
                     cv2.imshow("depth image:", depth)  # test output
                     self.collected_frames.append(scene_package)
 
-                    if len(self.collected_frames) >= 2 and all(len(frame["objects"]) >= 2 for frame in self.collected_frames[-2:]):
-                        # if we have more than 2 frames AND the last two frames include more than or 2 objects
-                        world = self.QSRPipeline.build_world_trace(self.collected_frames)
+                    if len(self.collected_frames) >= 10 and all(len(frame["objects"]) >= 2 for frame in self.collected_frames[-10:]):
+                        # if we have more than qsr length of  frames AND the last two frames include more than or 2 objects
+                        world = self.QSRPipeline.build_world_trace(self.collected_frames[-10:])  # only qsr on the last x frames
                         response = self.QSRPipeline.compute_qtc(world)
+
                         self.QSRPipeline.print_qtc(response)
-
-                    else:
-                        continue
-
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it
                 cv2.waitKey(1)

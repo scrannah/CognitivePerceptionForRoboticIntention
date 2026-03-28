@@ -10,6 +10,7 @@ class QSRPipeline:
 
     def build_world_trace(self, collected_frames):
 
+        # self.world = World_Trace()
         object_tracks = {}
 
         # Organize data per object

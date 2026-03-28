@@ -102,7 +102,7 @@ class YOLOPipeline:
             self.conceptnet_cache[object_label] = get_info(object_label)
 
         concept_info = self.conceptnet_cache[object_label]
-        return concept_info
+        return concept_info # useful for inference downstream
 
     def drawDetections(self, frame_display, detections_in_frame):
         for detection in detections_in_frame:
