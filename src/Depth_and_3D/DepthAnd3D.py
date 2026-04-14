@@ -77,10 +77,12 @@ class DepthPipeline:
         # assume square pixels
         self.fy = self.fx
 
-    def pixel_to_3d(self, u, v, depth):
+    def pixel_to_3d(self, u, v, depth, mask):
         # numpy arrays are indexed row, column [v, u]
-        z = float(depth[v, u]) # change to sampling of area OR using mask if mask fits criteria
-        # if mask pixel area not over x% of bbox, fall back to just sampling around area
+        if mask is None or np.sum(mask) == 0:
+            z = float(depth[v, u])  # fallback to centre pixel
+        else:
+            z = np.median(depth[mask])  # robust median over mask
 
         # convert pixel coordinates to camera coordinates
         # back-projection of pinhole camera model

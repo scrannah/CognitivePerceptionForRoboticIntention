@@ -11,9 +11,6 @@ class QSRPipeline:
     # Entry Point
 
     def process_frames(self, collected_frames):
-        """
-        Main function to call from your FullPipeline
-        """
 
         if len(collected_frames) < self.window_size:
             return None
@@ -36,9 +33,7 @@ class QSRPipeline:
 
 
     def filter_consistent_objects(self, frames): # Filtering consistent object in the frames
-        """
-        Keep only objects that appear in ALL frames
-        """
+        # Keep only objects that appear in ALL frames
 
         object_sets = [
             set(obj["label"] for obj in frame["objects"])
@@ -117,11 +112,9 @@ class QSRPipeline:
 
         return self.qsrlib.request_qsrs(request)
 
-    # -------------------------------
     # PRINT RESULTS
-    # -------------------------------
     def print_qtc(self, response):
-        print("\n--- SCENE ANALYSIS ---")
+        print("\n Scene analysis")
 
         # collect all person-object states across timesteps
         pair_states = {}
@@ -131,7 +124,7 @@ class QSRPipeline:
                 if 'person' not in pair:
                     continue # if no person we dont care
                 if not pair.startswith('person'):
-                    continue # only care about person to object
+                    continue # only care about person to object relation
                 if pair not in pair_states:
                     pair_states[pair] = []
                 pair_states[pair].append(relation.qsr.get('qtcbs', ''))
@@ -142,9 +135,7 @@ class QSRPipeline:
             interpretation = self.interpret_qtc(most_common)
             print(f"  {pair}: {interpretation}")
 
-    # -------------------------------
     # INTERPRET QTC
-    # -------------------------------
     def interpret_qtc(self, qtc):
         """
         Simple behavior interpretation

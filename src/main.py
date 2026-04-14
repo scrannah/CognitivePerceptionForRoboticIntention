@@ -31,7 +31,7 @@ class FullPipeline:
     def run(self):
         with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:  # declare ip here to prevent it defaulting to local
             # library may need edits if refusing to connect
-            time.sleep(3)  # give stream time to start
+            time.sleep(3)  # give stream time to start, if stuck here check camera isn't being held by something
 
             for _ in range(self.frame_length):  # how many frames to collect, maybe change to a timer
                 self.frame_id += 1
@@ -53,18 +53,18 @@ class FullPipeline:
                     depth = cv2.normalize(depth, None, 0, 255, cv2.NORM_MINMAX)
                     depth = depth.astype(np.uint8)
                     depth = cv2.applyColorMap(depth, cv2.COLORMAP_MAGMA)
-                    cv2.imshow("depth image:", depth)  # test output
+                    # cv2.imshow("depth image:", depth)  # test output
                     self.collected_frames.append(scene_package)
 
-                    if len(self.collected_frames) >= 10:
-                        response = self.QSRPipeline.process_frames(self.collected_frames)
-                        if response is not None:
-                            self.QSRPipeline.print_qtc(response)
+                    response = self.QSRPipeline.process_frames(self.collected_frames)
+                    if response is not None:
+                        self.QSRPipeline.print_qtc(response)
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it
                 cv2.waitKey(1)
 
         cv2.destroyAllWindows()
 
-pipeline = FullPipeline()
-pipeline.run()
+if __name__ == "__main__":
+    pipeline = FullPipeline()
+    pipeline.run()
