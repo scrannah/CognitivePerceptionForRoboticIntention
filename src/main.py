@@ -56,12 +56,10 @@ class FullPipeline:
                     cv2.imshow("depth image:", depth)  # test output
                     self.collected_frames.append(scene_package)
 
-                    if len(self.collected_frames) >= 10 and all(len(frame["objects"]) >= 2 for frame in self.collected_frames[-10:]):
-                        # if we have more than qsr length of  frames AND the last two frames include more than or 2 objects
-                        world = self.QSRPipeline.build_world_trace(self.collected_frames[-10:])  # only qsr on the last x frames
-                        response = self.QSRPipeline.compute_qtc(world)
-
-                        self.QSRPipeline.print_qtc(response)
+                    if len(self.collected_frames) >= 10:
+                        response = self.QSRPipeline.process_frames(self.collected_frames)
+                        if response is not None:
+                            self.QSRPipeline.print_qtc(response)
 
                 cv2.imshow("Reachy Camera", frame_display)  # got a frame, show it
                 cv2.waitKey(1)
