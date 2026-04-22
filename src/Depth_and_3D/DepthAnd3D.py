@@ -25,7 +25,6 @@ class DepthPipeline:
         self.fx = None
         self.fy = None
 
-
     def estimate_depth(self, img_rgb):
         # apply MiDaS transform
         input_batch = self.transform(img_rgb)
@@ -47,6 +46,26 @@ class DepthPipeline:
         depth = pred.cpu().numpy()
 
         return depth
+
+    def process_image(self, image_rgb, detections, frame_id, timestamp):
+        # pipeline
+        depth = self.estimate_depth(image_rgb)
+
+        # compute camera parameters once depth size known
+        self.compute_intrinsics(depth)
+
+        objects = [] # empty list to start from, each frame needs new object list
+
+        # process each detection
+        for detection in detections: # going over the detections in frame list
+            result = self.process_detection(detection, depth) # for each detection on depth map, process
+            objects.append(result) # append each detection result to object list
+
+        scene_package = self.package_scene(frame_id, timestamp, objects) # package full scene as frame, with objects within
+
+        print(scene_package)
+        return image_rgb, depth, scene_package # original frame, depth map, package
+
 
     def compute_intrinsics(self, depth):
         # get height and width
@@ -77,8 +96,29 @@ class DepthPipeline:
         # assume square pixels
         self.fy = self.fx
 
+
+    def process_detection(self, detection, depth):
+
+        bbox = detection["bbox"]
+        label = detection["label"]
+
+        # get centre pixel of detection, remove bbox centre logic in depth it is unused
+        u = detection["centre_x"]
+        v = detection["centre_y"]
+
+        mask = detection["mask"]
+
+        # convert centre pixel to 3d, consider using median depth for bounding box
+        # or use a cropped centre to remove background
+        x, y, z = self.pixel_to_3d(u, v, depth, mask)
+
+        # package just the object info
+        result = self.package_object(label, x, y, z) # get object as a list
+
+        return result
+
+
     def pixel_to_3d(self, u, v, depth, mask):
-        # numpy arrays are indexed row, column [v, u]
         if mask is None or np.sum(mask) == 0:
             z = float(depth[v, u])  # fallback to centre pixel
         else:
@@ -109,43 +149,3 @@ class DepthPipeline:
             "timestamp": timestamp,
             "objects": objects
         }
-
-    def process_detection(self, detection, depth):
-
-        bbox = detection["bbox"]
-        label = detection["label"]
-
-        # get centre pixel of detection, remove bbox centre logic in depth it is unused
-        u = detection["centre_x"]
-        v = detection["centre_y"]
-
-        # convert centre pixel to 3d, consider using median depth for bounding box
-        # or use a cropped centre to remove background
-        x, y, z = self.pixel_to_3d(u, v, depth)
-
-        # package just the object info
-        result = self.package_object(label, x, y, z) # get object as a list
-
-        return result
-
-
-    def process_image(self, image_rgb, detections, frame_id, timestamp):
-        # pipeline
-        depth = self.estimate_depth(image_rgb)
-
-
-        # compute camera parameters once depth size known
-        self.compute_intrinsics(depth)
-
-        objects = [] # empty list to start from, each frame needs new object list
-
-        # process each detection
-        for detection in detections: # going over the detections in frame list
-            result = self.process_detection(detection, depth) # for each detection on depth map, process
-            objects.append(result) # append each detection result to object list
-
-
-        scene_package = self.package_scene(frame_id, timestamp, objects) # package full scene as frame, with objects within
-
-        print(scene_package)
-        return image_rgb, depth, scene_package # original frame, depth map, package

@@ -29,7 +29,7 @@ class FullPipeline:
             time.sleep(0.05)  # not ready yet, wait and try again
 
     def run(self):
-        with ReachyMini(media_backend="default", host="172.20.10.4", connection_mode="network") as mini:  # declare ip here to prevent it defaulting to local
+        with ReachyMini(media_backend="default", host="172.20.1.11", connection_mode="network") as mini:  # declare ip here to prevent it defaulting to local
             # library may need edits if refusing to connect
             time.sleep(3)  # give stream time to start, if stuck here check camera isn't being held by something
 
